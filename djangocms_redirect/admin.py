@@ -2,7 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 from django.contrib import admin
-from django.contrib.redirects.models import Redirect
+from .models import Redirect
 
 
 @admin.register(Redirect)
