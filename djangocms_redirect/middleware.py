@@ -4,7 +4,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from django import http
 from django.apps import apps
 from django.conf import settings
-from django.contrib.redirects.models import Redirect
+from .models import Redirect
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
 
@@ -26,7 +26,7 @@ class RedirectFallbackMiddleware(object):
 
         full_path = request.get_full_path()
         current_site = get_current_site(request)
-
+        #response = http.HttpResponseRedirect('/')
         r = None
         try:
             r = Redirect.objects.get(site=current_site, old_path=full_path)
@@ -44,6 +44,4 @@ class RedirectFallbackMiddleware(object):
             if r.new_path == '':
                 return self.response_gone_class()
             return self.response_redirect_class(r.new_path)
-
-        # No redirect was found. Return the response.
-        return response
+        #return response
