@@ -26,7 +26,6 @@ class RedirectFallbackMiddleware(object):
 
         full_path = request.get_full_path()
         current_site = get_current_site(request)
-        #response = http.HttpResponseRedirect('/')
         r = None
         try:
             r = Redirect.objects.get(site=current_site, old_path=full_path)
@@ -44,4 +43,3 @@ class RedirectFallbackMiddleware(object):
             if r.new_path == '':
                 return self.response_gone_class()
             return self.response_redirect_class(r.new_path)
-        #return response
