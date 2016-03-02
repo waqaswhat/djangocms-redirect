@@ -9,7 +9,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
 
 
-class RedirectFallbackMiddleware(object):
+class CmsRedirectFallbackMiddleware(object):
 
     # Defined as class-level attributes to be subclassing-friendly.
     response_gone_class = http.HttpResponseGone
