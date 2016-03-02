@@ -6,12 +6,15 @@ from tempfile import mkdtemp
 
 HELPER_SETTINGS = dict(
     INSTALLED_APPS=[
-    'menus',
-    'cms',
     ],
     FILE_UPLOAD_TEMP_DIR=mkdtemp(),
-)
 
+    MIDDLEWARE_CLASSES = [
+        'djangocms_redirect.middleware.CmsRedirectFallbackMiddleware',
+    ],
+
+)
+print(HELPER_SETTINGS['INSTALLED_APPS'])
 
 def run():
     from djangocms_helper import runner
