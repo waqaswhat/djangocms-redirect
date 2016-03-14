@@ -19,13 +19,13 @@ print(HELPER_SETTINGS['INSTALLED_APPS'])
 
 def run():
     from djangocms_helper import runner
-    runner.run('djangocms_redirect')
+    runner.cms('djangocms_redirect')
 
 
 def setup():
     import sys
     from djangocms_helper import runner
-    runner.cms('djangocms_redirect', sys.modules[__name__], use_cms=False)
+    runner.run('djangocms_redirect', sys.modules[__name__], use_cms=False)
 
 if __name__ == "__main__":
     run()

@@ -3,13 +3,13 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 from cms.models import Page, Title
 from django.contrib.sites.models import Site
-from django.test import TestCase
+from .base import BaseRedirectTest
 from django.test.client import Client
 
 from djangocms_redirect.models import Redirect
 
 
-class TestRedirect(TestCase):
+class TestRedirect(BaseRedirectTest):
 
     def setUp(self):
 
