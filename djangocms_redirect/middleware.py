@@ -13,7 +13,8 @@ class CmsRedirectFallbackMiddleware(object):
 
     # Defined as class-level attributes to be subclassing-friendly.
     response_gone_class = http.HttpResponseGone
-    response_redirect_class = http.HttpResponsePermanentRedirect
+    response_redirect_class = http.HttpResponseRedirect
+    response_permanent_redirect_class = http.HttpResponsePermanentRedirect
 
     def __init__(self):
         if not apps.is_installed('django.contrib.sites'):
@@ -42,4 +43,7 @@ class CmsRedirectFallbackMiddleware(object):
         if r is not None:
             if r.new_path == '':
                 return self.response_gone_class()
-            return self.response_redirect_class(r.new_path)
+            if r.response_code == '302':
+                return self.response_redirect_class(r.new_path)
+            elif r.response_code == '301':
+                return self.response_permanent_redirect_class(r.new_path)
