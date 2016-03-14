@@ -10,7 +10,7 @@ from django.core.exceptions import ImproperlyConfigured
 from .models import Redirect
 
 
-class CmsRedirectFallbackMiddleware(object):
+class RedirectMiddleware(object):
 
     # Defined as class-level attributes to be subclassing-friendly.
     response_gone_class = http.HttpResponseGone
@@ -20,8 +20,8 @@ class CmsRedirectFallbackMiddleware(object):
     def __init__(self):
         if not apps.is_installed('django.contrib.sites'):
             raise ImproperlyConfigured(
-                "You cannot use RedirectFallbackMiddleware when "
-                "django.contrib.sites is not installed."
+                'You cannot use RedirectFallbackMiddleware when '
+                'django.contrib.sites is not installed.'
             )
 
     def process_request(self, request):

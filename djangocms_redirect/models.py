@@ -20,21 +20,21 @@ class Redirect(models.Model):
         ('redirect from'),
         max_length=200,
         db_index=True,
-        help_text=_("Select a Page or write an url")
+        help_text=_('Select a Page or write an url')
     )
     new_path = models.CharField(
         ('redirect to'),
         max_length=200,
         blank=True,
-        help_text=_("Select a Page or write an url")
+        help_text=_('Select a Page or write an url')
     )
     response_code = models.CharField(
         _('response code'),
         max_length=3,
         choices=RESPONSE_CODES,
         default=RESPONSE_CODES[0][0],
-        help_text=_("This is the http response code returned if a destination "
-                    "is specified. If no destination is specified the response code will be 410."))
+        help_text=_('This is the http response code returned if a destination '
+                    'is specified. If no destination is specified the response code will be 410.'))
 
     class Meta:
         verbose_name = _('redirect')
@@ -44,4 +44,4 @@ class Redirect(models.Model):
         ordering = ('old_path',)
 
     def __str__(self):
-        return "%s ---> %s" % (self.old_path, self.new_path)
+        return '%s ---> %s' % (self.old_path, self.new_path)
