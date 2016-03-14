@@ -6,7 +6,7 @@ from tempfile import mkdtemp
 
 HELPER_SETTINGS = dict(
     INSTALLED_APPS=[
-    'djangocms_redirect',
+        'djangocms_redirect',
     ],
     FILE_UPLOAD_TEMP_DIR=mkdtemp(),
 
@@ -25,7 +25,7 @@ def run():
 def setup():
     import sys
     from djangocms_helper import runner
-    runner.setup('djangocms_redirect', sys.modules[__name__], use_cms=False)
+    runner.cms('djangocms_redirect', sys.modules[__name__], use_cms=False)
 
 if __name__ == "__main__":
     run()
