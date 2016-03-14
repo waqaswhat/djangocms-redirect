@@ -4,9 +4,10 @@ from __future__ import absolute_import, print_function, unicode_literals
 from django import http
 from django.apps import apps
 from django.conf import settings
-from .models import Redirect
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
+
+from .models import Redirect
 
 
 class CmsRedirectFallbackMiddleware(object):
@@ -41,9 +42,9 @@ class CmsRedirectFallbackMiddleware(object):
             except Redirect.DoesNotExist:
                 pass
         if r is not None:
-            if r.new_path == '':
+            if r.new_path == '' or r.response_code == '410':
                 return self.response_gone_class()
-            if r.response_code == '302':
+            elif r.response_code == '302':
                 return self.response_redirect_class(r.new_path)
             elif r.response_code == '301':
                 return self.response_permanent_redirect_class(r.new_path)

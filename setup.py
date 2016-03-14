@@ -53,6 +53,7 @@ setup(
     ],
     include_package_data=True,
     install_requires=[
+        'django-cms'
     ],
     license="BSD",
     zip_safe=False,

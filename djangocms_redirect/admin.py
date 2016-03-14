@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-from django.forms import ModelForm
-from django.contrib import admin
-from django.utils.translation import get_language
 from cms.forms.widgets import PageSmartLinkWidget
+from django.contrib import admin
+from django.forms import ModelForm
+from django.utils.translation import get_language
+
 from .models import Redirect
 
 
@@ -16,7 +17,7 @@ class RedirectForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(RedirectForm, self).__init__(*args, **kwargs)
         widget = PageSmartLinkWidget(ajax_view='admin:cms_page_get_published_pagelist')
-        widget.language = get_language() 
+        widget.language = get_language()
         self.fields['old_path'].widget = widget
         self.fields['new_path'].widget = widget
 
@@ -27,4 +28,4 @@ class RedirectAdmin(admin.ModelAdmin):
     list_filter = ('site',)
     search_fields = ('old_path', 'new_path')
     radio_fields = {'site': admin.VERTICAL}
-    form = RedirectForm 
+    form = RedirectForm
