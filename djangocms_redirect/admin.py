@@ -16,7 +16,7 @@ class RedirectForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(RedirectForm, self).__init__(*args, **kwargs)
         widget = PageSmartLinkWidget(ajax_view='admin:cms_page_get_published_pagelist')
-        widget.language = 'en'
+        widget.language = get_language() 
         self.fields['old_path'].widget = widget
         self.fields['new_path'].widget = widget
 
