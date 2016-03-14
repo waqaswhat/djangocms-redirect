@@ -58,6 +58,7 @@ setup(
     license="BSD",
     zip_safe=False,
     keywords='djangocms-redirect',
+    test_suite='cms_helper.run',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Framework :: Django',
