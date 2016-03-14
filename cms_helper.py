@@ -6,6 +6,7 @@ from tempfile import mkdtemp
 
 HELPER_SETTINGS = dict(
     INSTALLED_APPS=[
+    'djangocms_redirect',
     ],
     FILE_UPLOAD_TEMP_DIR=mkdtemp(),
 
