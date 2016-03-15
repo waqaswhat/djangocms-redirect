@@ -7,7 +7,7 @@ Welcome to djangocms-redirect's documentation!
 =================================================================
 
 Djangocms-redirect is a simple middleware inspired by the official
-django redirect middleware with the bonus of beeing integrated with django-cms.
+django redirect middleware with the benefit of beeing integrated with django-cms.
 
 It's possible to select the old url and the new url by searching for
 a django-cms page or simply by writing an url.
@@ -15,7 +15,7 @@ a django-cms page or simply by writing an url.
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    readme
    installation
