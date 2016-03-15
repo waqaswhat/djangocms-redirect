@@ -14,7 +14,8 @@ Or, if you have virtualenvwrapper installed::
 
 Configuration and setup
 =======================
+Configuring django-cms redirect is extremly easy:
 
-Add to your MIDDLEWARE_CLASSES in your settings.py file this line:
-'djangocms_redirect.middleware.RedirectMiddleware'.
+* Add 'djangocms_redirect.middleware.RedirectMiddleware' to your MIDDLEWARE_CLASSES in your settings.py file
 
+* Add 'djangocms_redirect' to your INSTALLED_APPS in your settings.py file.

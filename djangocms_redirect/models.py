@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 RESPONSE_CODES = (
     ('301', _('301 - Permanent redirection')),
     ('302', _('302- Temporary redirection'),),
-    ('410',  ('410 - Permanently unavailable'),),
+    ('410', _('410 - Permanently unavailable'),),
 )
 
 
@@ -17,13 +17,13 @@ RESPONSE_CODES = (
 class Redirect(models.Model):
     site = models.ForeignKey(Site, verbose_name=_('site'))
     old_path = models.CharField(
-        ('redirect from'),
+        _('redirect from'),
         max_length=200,
         db_index=True,
         help_text=_('Select a Page or write an url')
     )
     new_path = models.CharField(
-        ('redirect to'),
+        _('redirect to'),
         max_length=200,
         blank=True,
         help_text=_('Select a Page or write an url')
@@ -44,4 +44,4 @@ class Redirect(models.Model):
         ordering = ('old_path',)
 
     def __str__(self):
-        return '%s ---> %s' % (self.old_path, self.new_path)
+        return '{0} ---> {1}'.format(self.old_path, self.new_path)
