@@ -10,11 +10,12 @@ HELPER_SETTINGS = dict(
     ],
     FILE_UPLOAD_TEMP_DIR=mkdtemp(),
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE_CLASSES=[
         'djangocms_redirect.middleware.RedirectMiddleware',
     ],
 
 )
+
 
 def run():
     from djangocms_helper import runner
@@ -26,5 +27,6 @@ def setup():
     from djangocms_helper import runner
     runner.setup('djangocms_redirect', sys.modules[__name__], use_cms=True)
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     run()

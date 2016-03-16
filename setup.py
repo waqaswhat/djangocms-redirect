@@ -23,7 +23,7 @@ version = get_version('djangocms_redirect', '__init__.py')
 
 if sys.argv[-1] == 'publish':
     try:
-        import wheel
+        import wheel  # NOQA
     except ImportError:
         print('Wheel library missing. Please run "pip install wheel"')
         sys.exit()
@@ -32,9 +32,9 @@ if sys.argv[-1] == 'publish':
     sys.exit()
 
 if sys.argv[-1] == 'tag':
-    print("Tagging the version on github:")
-    os.system("git tag -a %s -m 'version %s'" % (version, version))
-    os.system("git push --tags")
+    print('Tagging the version on github:')
+    os.system('git tag -a %s -m "version %s"' % (version, version))
+    os.system('git push --tags')
     sys.exit()
 
 readme = open('README.rst').read()
@@ -55,7 +55,7 @@ setup(
     install_requires=[
         'django-cms'
     ],
-    license="BSD",
+    license='BSD',
     zip_safe=False,
     keywords='djangocms-redirect',
     test_suite='cms_helper.run',
