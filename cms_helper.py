@@ -13,7 +13,12 @@ HELPER_SETTINGS = dict(
     MIDDLEWARE_CLASSES=[
         'djangocms_redirect.middleware.RedirectMiddleware',
     ],
-
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': '127.0.0.1:11211',
+        }
+    }
 )
 
 

@@ -5,6 +5,7 @@ from django import http
 from django.apps import apps
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 
 from .models import Redirect
@@ -29,22 +30,35 @@ class RedirectMiddleware(object):
         full_path = request.get_full_path()
         current_site = get_current_site(request)
         r = None
-        try:
-            r = Redirect.objects.get(site=current_site, old_path=full_path)
-        except Redirect.DoesNotExist:
-            pass
-        if r is None and settings.APPEND_SLASH and not request.path.endswith('/'):
+        key = '{0}_{1}'.format(full_path, settings.SITE_ID)
+        cached_redirect = cache.get(key)
+        if not cached_redirect:
             try:
-                r = Redirect.objects.get(
-                    site=current_site,
-                    old_path=request.get_full_path(force_append_slash=True),
-                )
+                r = Redirect.objects.get(site=current_site, old_path=full_path)
             except Redirect.DoesNotExist:
                 pass
-        if r is not None:
-            if r.new_path == '' or r.response_code == '410':
-                return self.response_gone_class()
-            elif r.response_code == '302':
-                return self.response_redirect_class(r.new_path)
-            elif r.response_code == '301':
-                return self.response_permanent_redirect_class(r.new_path)
+            if r is None and settings.APPEND_SLASH and not request.path.endswith('/'):
+                try:
+                    r = Redirect.objects.get(
+                        site=current_site,
+                        old_path=request.get_full_path(force_append_slash=True),
+                    )
+                except Redirect.DoesNotExist:
+                    pass
+            cache.set(
+                key,
+                {
+                    'site': settings.SITE_ID,
+                    'redirect': r.new_path if r else None,
+                    'status_code': r.response_code if r else None,
+                },
+            )
+            cached_redirect = cache.get(key)
+        if cached_redirect['redirect'] == '':
+            return self.response_gone_class()
+        if cached_redirect['status_code'] == '302':
+            return self.response_redirect_class(cached_redirect['redirect'])
+        elif cached_redirect['status_code'] == '301':
+            return self.response_permanent_redirect_class(cached_redirect['redirect'])
+        elif cached_redirect['status_code'] == '410':
+            return self.response_gone_class()
