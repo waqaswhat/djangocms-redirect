@@ -45,15 +45,12 @@ class RedirectMiddleware(object):
                     )
                 except Redirect.DoesNotExist:
                     pass
-            cache.set(
-                key,
-                {
-                    'site': settings.SITE_ID,
-                    'redirect': r.new_path if r else None,
-                    'status_code': r.response_code if r else None,
-                },
-            )
-            cached_redirect = cache.get(key)
+            cached_redirect = {
+                'site': settings.SITE_ID,
+                'redirect': r.new_path if r else None,
+                'status_code': r.response_code if r else None,
+            }
+            cache.set(key, cached_redirect)
         if cached_redirect['redirect'] == '':
             return self.response_gone_class()
         if cached_redirect['status_code'] == '302':
