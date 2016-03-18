@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
+from django.conf import settings
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 from django.db import models
+from django.db.models.signals import post_delete, post_save
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -45,3 +48,11 @@ class Redirect(models.Model):
 
     def __str__(self):
         return '{0} ---> {1}'.format(self.old_path, self.new_path)
+
+
+def clear_redirect_cache(**kwargs):
+    key = '{0}_{1}'.format(kwargs['instance'].old_path, settings.SITE_ID)
+    cache.delete(key)
+
+post_save.connect(clear_redirect_cache, sender=Redirect)
+post_delete.connect(clear_redirect_cache, sender=Redirect)
