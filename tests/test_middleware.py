@@ -43,7 +43,6 @@ class TestRedirect(BaseRedirectTest):
         )
 
         client = Client()
-        from django.core.cache import cache
         response = client.get('/en/test-page/')
         self.assertEqual(response.status_code, 301)
         self.assertRedirects(response, redirect.new_path, status_code=301)
