@@ -85,6 +85,22 @@ class TestRedirect(BaseRedirectTest):
         response2 = client.get('/some-path/')
         self.assertEqual(response2.status_code, 410)
 
+    def test_use_response(self):
+
+        with self.settings(DJANGOCMS_REDIRECT_USE_REQUEST=False):
+            redirect = Redirect.objects.create(
+                site=self.site,
+                old_path=str(self.page1.get_absolute_url()),
+                new_path='/en/',
+                response_code='302',
+            )
+
+            client = Client()
+
+            response = client.get('/en/test-page/')
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, redirect.new_path, status_code=302)
+
     def test_delete_redirect(self):
         redirect = Redirect.objects.create(
             site=self.site,

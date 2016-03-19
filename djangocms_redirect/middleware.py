@@ -25,7 +25,7 @@ class RedirectMiddleware(object):
                 'django.contrib.sites is not installed.'
             )
 
-    def process_request(self, request):
+    def do_redirect(self, request):
 
         full_path = request.get_full_path()
         current_site = get_current_site(request)
@@ -59,3 +59,15 @@ class RedirectMiddleware(object):
             return self.response_permanent_redirect_class(cached_redirect['redirect'])
         elif cached_redirect['status_code'] == '410':
             return self.response_gone_class()
+
+    def process_request(self, request):
+        if getattr(settings, 'DJANGOCMS_REDIRECT_USE_REQUEST', True):
+            return self.do_redirect(request)
+
+    def process_response(self, request, response):
+        redirect = None
+        if not getattr(settings, 'DJANGOCMS_REDIRECT_USE_REQUEST', True):
+            redirect = self.do_redirect(request)
+        if redirect:
+            return redirect
+        return response
