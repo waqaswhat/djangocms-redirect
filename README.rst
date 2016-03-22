@@ -33,29 +33,42 @@ djangocms-redirect
 
 A django CMS enabled application to handle redirects
 
+This is heavily borrowed from ``django.contrib.redirects`` with three major changes:
+
+* Selection of django CMS pages
+* Selection of redirect status code
+* Middleware can processed in the request or response phase
+
+Why using process_request?
+--------------------------
+
+Doing database queries in the middleware ``process_request`` is heavily discouraged as it's a
+performance hit, especially when doing redirects which are just a tiny part of the
+processed requests.
+Except that sometimes it's just what you need (for example to "hide" content without deleting
+/ unpublishing it)
+By caching both existing and non existing redirects for a given URL the performance hit is
+minimized for the use cases that requires ``process_request``.
+
 Documentation
 -------------
 
 The full documentation is at https://djangocms-redirect.readthedocs.org.
 
-Quickstart
-----------
+Installation
+------------
 
-Install djangocms-redirect::
-
-    pip install djangocms-redirect
-
-Then use it in a project::
-
-    import djangocms_redirect
+See https://djangocms-redirect.readthedocs.org/en/latest/installation.html
 
 Features
 --------
 
-* TODO
+* Set old and new path, by selection existing django CMS pages or writing down the complete address
+* Select the redirect status code (301, 302)
+* Support for status code 410
 
 Running Tests
---------------
+-------------
 
 Does the code actually work?
 
@@ -63,7 +76,7 @@ Does the code actually work?
 
     source <YOURVIRTUALENV>/bin/activate
     (myenv) $ pip install -r requirements-test.txt
-    (myenv) $ python runtests.py
+    (myenv) $ python setup.py test
 
 Credits
 ---------

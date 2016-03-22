@@ -2,25 +2,38 @@
 Installation
 ============
 
-At the command line::
+* Install djangocms-redirect::
 
-    $ easy_install djangocms-redirect
+    pip install djangocms-redirect
 
-Or, if you have virtualenvwrapper installed::
+* Add to INSTALLED_APPS::
 
-    $ mkvirtualenv djangocms-redirect
-    $ pip install djangocms-redirect
+    INSTALLED_APPS = [
+        ...
+        djangocms_redirect
+        ...
+    ]
 
+* Add to MIDDLEWARE_CLASSES:
 
-Configuration and setup
-=======================
-Configuring django-cms redirect is extremely easy:
+  If you intend to use ``process_request`` the add it near the top (after
+  ``django.middleware.cache.UpdateCacheMiddleware``); if using ``process_response`` add at the
+  bottom (before ``django.middleware.cache.FetchFromCacheMiddleware``)::
 
-* Add 'djangocms_redirect.middleware.RedirectMiddleware' to your MIDDLEWARE_CLASSES in your settings.py file
+    MIDDLEWARE_CLASSES = [
+        ...
+        djangocms_redirect.middleware.RedirectMiddleware
+        ...
+    ]
 
-* Add 'djangocms_redirect' to your INSTALLED_APPS in your settings.py file.
 
 * Choose if you want to process the redirect during the request (default) or response by setting:
 
     * ``DJANGOCMS_REDIRECT_USE_REQUEST = True``: during request
     * ``DJANGOCMS_REDIRECT_USE_REQUEST = False``: during response
+
+* Migrate
+
+    python manage.py migrate
+
+The go to ``http://mysite.com/admin/djangocms_redirect/`` and create redirect instances.
