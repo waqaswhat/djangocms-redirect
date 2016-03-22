@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db import models
@@ -51,7 +50,7 @@ class Redirect(models.Model):
 
 
 def clear_redirect_cache(**kwargs):
-    key = '{0}_{1}'.format(kwargs['instance'].old_path, settings.SITE_ID)
+    key = '{0}_{1}'.format(kwargs['instance'].old_path, kwargs['instance'].site_id)
     cache.delete(key)
 
 post_save.connect(clear_redirect_cache, sender=Redirect)
