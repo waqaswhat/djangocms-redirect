@@ -53,12 +53,12 @@ minimized for the use cases that requires ``process_request``.
 Documentation
 -------------
 
-The full documentation is at https://djangocms-redirect.readthedocs.org.
+The full documentation is at https://djangocms-redirect.readthedocs.io.
 
 Installation
 ------------
 
-See https://djangocms-redirect.readthedocs.org/en/latest/installation.html
+See https://djangocms-redirect.readthedocs.io/en/latest/installation.html
 
 Features
 --------
