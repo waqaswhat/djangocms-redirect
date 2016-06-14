@@ -13,7 +13,9 @@ env:
   matrix:
   - DJANGO='django18' CMS='cms31'
   - DJANGO='django18' CMS='cms32'
+  - DJANGO='django18' CMS='cms33'
   - DJANGO='django19' CMS='cms32'
+  - DJANGO='django19' CMS='cms33'
   - TOXENV='pep8'
   - TOXENV='isort'
   - TOXENV='docs'
