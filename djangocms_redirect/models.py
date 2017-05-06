@@ -5,6 +5,7 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db import models
 from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -49,9 +50,8 @@ class Redirect(models.Model):
         return '{0} ---> {1}'.format(self.old_path, self.new_path)
 
 
+@receiver(post_save, sender=Redirect)
+@receiver(post_delete, sender=Redirect)
 def clear_redirect_cache(**kwargs):
     key = '{0}_{1}'.format(kwargs['instance'].old_path, kwargs['instance'].site_id)
     cache.delete(key)
-
-post_save.connect(clear_redirect_cache, sender=Redirect)
-post_delete.connect(clear_redirect_cache, sender=Redirect)

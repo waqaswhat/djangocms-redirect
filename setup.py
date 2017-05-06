@@ -19,6 +19,7 @@ def get_version(*file_paths):
         return version_match.group(1)
     raise RuntimeError('Unable to find version string.')
 
+
 version = get_version('djangocms_redirect', '__init__.py')
 
 if sys.argv[-1] == 'publish':
