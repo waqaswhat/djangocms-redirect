@@ -39,10 +39,16 @@ class RedirectMiddleware(object):
                 pass
             if r is None and settings.APPEND_SLASH and not request.path.endswith('/'):
                 try:
-                    r = Redirect.objects.get(
-                        site=current_site,
-                        old_path=request.get_full_path(force_append_slash=True),
-                    )
+                    try:
+                        r = Redirect.objects.get(
+                            site=current_site,
+                            old_path=request.get_full_path(force_append_slash=True),
+                        )
+                    except TypeError:
+                        r = Redirect.objects.get(
+                            site=current_site,
+                            old_path=request.get_full_path(),
+                        )
                 except Redirect.DoesNotExist:
                     pass
             cached_redirect = {
