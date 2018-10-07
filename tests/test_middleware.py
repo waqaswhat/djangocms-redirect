@@ -63,10 +63,24 @@ class TestRedirect(BaseRedirectTest):
         response2 = self.client.get('/some-path/')
         self.assertEqual(response2.status_code, 410)
 
-    def test_use_response(self):
+    def test_use_response_404_only(self):
         pages = self.get_pages()
 
         with self.settings(DJANGOCMS_REDIRECT_USE_REQUEST=False):
+            redirect = Redirect.objects.create(
+                site=self.site_1,
+                old_path=pages[1].get_absolute_url(),
+                new_path=pages[0].get_absolute_url(),
+                response_code='302',
+            )
+
+            response = self.client.get(pages[1].get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+
+    def test_use_response_no404(self):
+        pages = self.get_pages()
+
+        with self.settings(DJANGOCMS_REDIRECT_USE_REQUEST=False, DJANGOCMS_REDIRECT_404_ONLY=False):
             redirect = Redirect.objects.create(
                 site=self.site_1,
                 old_path=pages[1].get_absolute_url(),
