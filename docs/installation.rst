@@ -37,3 +37,11 @@ Installation
     python manage.py migrate
 
 The go to ``http://mysite.com/admin/djangocms_redirect/`` and create redirect instances.
+
+
+Settings
+========
+
+* ``DJANGOCMS_REDIRECT_USE_REQUEST``: If ``True`` the redirect check will be done in the request phase, to allow preempting any other logic. **Beware**: this will result in extra queries on **each** request because the redirects will be checked before the view logic triggers. If ``False`` the redirect will be triggered in the response phase.
+* ``DJANGOCMS_REDIRECT_CACHE_TIMEOUT``: You can provide a custom cache timeout (Default: 3600 sec)
+
