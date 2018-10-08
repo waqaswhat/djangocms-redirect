@@ -1,118 +1,95 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-from cms.models import Page, Title
-from django.contrib.sites.models import Site
-from .base import BaseRedirectTest
-from django.test.client import Client
-
 from djangocms_redirect.models import Redirect
+
+from .base import BaseRedirectTest
 
 
 class TestRedirect(BaseRedirectTest):
 
-    def setUp(self):
-
-        self.site = Site.objects.get_current()
-        self.homepage = Page.objects.create(site=self.site)
-        self.hptitle = Title.objects.create(
-            title='Home page',
-            slug='home-page',
-            page=self.homepage,
-            language='en',
-        )
-        self.homepage.publish(language='en')
-
-        self.page1 = Page.objects.create(site=self.site)
-
-        self.title1 = Title.objects.create(
-            title='Test page',
-            slug='test-page',
-            page=self.page1,
-            language='en',
-        )
-        self.page1.publish(language='en')
+    _pages_data = (
+        {'en': {'title': 'home page', 'template': 'page.html', 'publish': True}},
+        {'en': {'title': 'test page', 'template': 'page.html', 'publish': True}},
+    )
 
     def test_301_redirect(self):
+        pages = self.get_pages()
 
         redirect = Redirect.objects.create(
-            site=self.site,
-            old_path=str(self.page1.get_absolute_url()),
-            new_path='/en/',
+            site=self.site_1,
+            old_path=pages[1].get_absolute_url(),
+            new_path=pages[0].get_absolute_url(),
             response_code='301',
         )
 
-        client = Client()
-        response = client.get('/en/test-page/')
+        response = self.client.get(pages[1].get_absolute_url())
         self.assertEqual(response.status_code, 301)
         self.assertRedirects(response, redirect.new_path, status_code=301)
 
     def test_302_redirect(self):
+        pages = self.get_pages()
 
         redirect = Redirect.objects.create(
-            site=self.site,
-            old_path=str(self.page1.get_absolute_url()),
-            new_path='/en/',
+            site=self.site_1,
+            old_path=pages[1].get_absolute_url(),
+            new_path=pages[0].get_absolute_url(),
             response_code='302',
         )
 
-        client = Client()
-
-        response = client.get('/en/test-page/')
+        response = self.client.get(pages[1].get_absolute_url())
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, redirect.new_path, status_code=302)
 
     def test_410_redirect(self):
+        pages = self.get_pages()
 
         Redirect.objects.create(
-            site=self.site,
-            old_path=str(self.page1.get_absolute_url()),
-            new_path='/en/',
+            site=self.site_1,
+            old_path=pages[1].get_absolute_url(),
+            new_path=pages[0].get_absolute_url(),
             response_code='410',
         )
 
-        client = Client()
-
-        response = client.get('/en/test-page/')
+        response = self.client.get(pages[1].get_absolute_url())
         self.assertEqual(response.status_code, 410)
 
         Redirect.objects.create(
-            site=self.site,
+            site=self.site_1,
             old_path='/some-path/',
             response_code='302'
         )
 
-        response2 = client.get('/some-path/')
+        response2 = self.client.get('/some-path/')
         self.assertEqual(response2.status_code, 410)
 
     def test_use_response(self):
+        pages = self.get_pages()
 
         with self.settings(DJANGOCMS_REDIRECT_USE_REQUEST=False):
             redirect = Redirect.objects.create(
-                site=self.site,
-                old_path=str(self.page1.get_absolute_url()),
-                new_path='/en/',
+                site=self.site_1,
+                old_path=pages[1].get_absolute_url(),
+                new_path=pages[0].get_absolute_url(),
                 response_code='302',
             )
 
-            client = Client()
-
-            response = client.get('/en/test-page/')
+            response = self.client.get(pages[1].get_absolute_url())
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, redirect.new_path, status_code=302)
 
     def test_delete_redirect(self):
+        pages = self.get_pages()
+
         redirect = Redirect.objects.create(
-            site=self.site,
-            old_path=str(self.page1.get_absolute_url()),
-            new_path='/en/',
+            site=self.site_1,
+            old_path=pages[1].get_absolute_url(),
+            new_path=pages[0].get_absolute_url(),
             response_code='301',
         )
 
-        client = Client()
-
-        response = client.get('/en/test-page/')
+        response = self.client.get(pages[1].get_absolute_url())
         self.assertRedirects(response, redirect.new_path, status_code=301)
         redirect.delete()
-        response2 = client.get('/en/test-page/')
+        response2 = self.client.get(pages[1].get_absolute_url())
         self.assertEqual(response2.status_code, 200)
