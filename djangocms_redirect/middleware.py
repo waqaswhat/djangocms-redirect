@@ -10,7 +10,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import MiddlewareMixin
 
 from .models import Redirect
-
+from .utils import get_key_from_path_and_site
 
 class RedirectMiddleware(MiddlewareMixin):
 
@@ -32,7 +32,7 @@ class RedirectMiddleware(MiddlewareMixin):
         full_path = request.get_full_path()
         current_site = get_current_site(request)
         r = None
-        key = '{0}_{1}'.format(full_path, settings.SITE_ID)
+        key = get_key_from_path_and_site(full_path, settings.SITE_ID)
         cached_redirect = cache.get(key)
         if not cached_redirect:
             try:

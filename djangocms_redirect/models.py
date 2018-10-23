@@ -53,5 +53,6 @@ class Redirect(models.Model):
 @receiver(post_save, sender=Redirect)
 @receiver(post_delete, sender=Redirect)
 def clear_redirect_cache(**kwargs):
-    key = '{0}_{1}'.format(kwargs['instance'].old_path, kwargs['instance'].site_id)
+    from .utils import get_key_from_path_and_site
+    key = get_key_from_path_and_site(kwargs['instance'].old_path, kwargs['instance'].site_id)
     cache.delete(key)
