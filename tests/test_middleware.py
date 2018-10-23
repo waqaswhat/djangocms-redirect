@@ -39,11 +39,7 @@ class TestRedirect(BaseRedirectTest):
         )
 
         response = self.client.get(pages[1].get_absolute_url())
-        print("pages[0].get_absolute_url() : ",pages[0].get_absolute_url())
-        print("pages[1].get_absolute_url() : ",pages[1].get_absolute_url())
-        print("request.url : ",pages[1].get_absolute_url())
-        print("response.url : ",response.url)
-        #self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, redirect.new_path)#, status_code=302)
 
     def test_410_redirect(self):
