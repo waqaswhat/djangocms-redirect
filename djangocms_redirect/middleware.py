@@ -27,7 +27,12 @@ class RedirectMiddleware(MiddlewareMixin):
             )
         super(RedirectMiddleware, self).__init__(*args, **kwargs)
 
-    def do_redirect(self, request):
+    def do_redirect(self, request, response=None):
+        if (
+            getattr(settings, 'DJANGOCMS_REDIRECT_404_ONLY', True) and
+            response and response.status_code != 404
+        ):
+            return response
 
         full_path = request.get_full_path()
         current_site = get_current_site(request)
@@ -78,7 +83,7 @@ class RedirectMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
         redirect = None
         if not getattr(settings, 'DJANGOCMS_REDIRECT_USE_REQUEST', True):
-            redirect = self.do_redirect(request)
+            redirect = self.do_redirect(request, response)
         if redirect:
             return redirect
         return response

@@ -8,6 +8,7 @@ History
 
 * Updated for Django 1.11
 * Added configurable cache timeout
+* Added configuration option to check redirect on 404 only
 
 0.1.1 (2017-11-19)
 ++++++++++++++++++
