@@ -3,7 +3,7 @@
 History
 -------
 
-0.2.0 (unreleased)
+0.2.0 (2018-11-03)
 ++++++++++++++++++
 
 * Updated for Django 1.11
