@@ -3,7 +3,12 @@
 History
 -------
 
-0.1.1 (unreleased)
+0.2.0 (unreleased)
+++++++++++++++++++
+
+* Update for Django 1.11
+
+0.1.1 (2017-11-19)
 ++++++++++++++++++
 
 * Added missing migration.
