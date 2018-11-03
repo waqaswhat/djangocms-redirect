@@ -58,7 +58,10 @@ class RedirectMiddleware(MiddlewareMixin):
                 'redirect': r.new_path if r else None,
                 'status_code': r.response_code if r else None,
             }
-            cache.set(key, cached_redirect)
+            cache.set(
+                key, cached_redirect,
+                timeout=getattr(settings, 'DJANGOCMS_REDIRECT_CACHE_TIMEOUT', 3600)
+            )
         if cached_redirect['redirect'] == '':
             return self.response_gone_class()
         if cached_redirect['status_code'] == '302':
