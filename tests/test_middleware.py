@@ -40,7 +40,7 @@ class TestRedirect(BaseRedirectTest):
 
         response = self.client.get(pages[1].get_absolute_url())
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, redirect.new_path)#, status_code=302)
+        self.assertRedirects(response, redirect.new_path, status_code=302)
 
     def test_410_redirect(self):
         pages = self.get_pages()
@@ -110,17 +110,30 @@ else:
             }
         }
     )
-    class TestMemcacheRedirect(BaseRedirectTest):
+    class TestMemcacheRedirect(TestRedirect):
                 
         def test_fix_memcache_MemcachedKeyLengthError(self):
-            """
+            '''
             Fixes https://github.com/nephila/djangocms-redirect/issues/8
-            Using an url > 250 chars memcache go in overflow -> memcache.Client.MemcachedKeyLengthError
-            """
-            url = "/?"+('x'*250) # url > 250 chars
-            response = self.client.get(url)
+            Using an url > 250 chars with memcache active, a memcache.Client.MemcachedKeyLengthError is raised
+            '''
+            pages = self.get_pages()
+
+            url = "{}?{}".format(
+                pages[1].get_absolute_url(), 
+                'x'*250 # url > 250 chars
+            )
+
+            redirect = Redirect.objects.create(
+                site=self.site_1,
+                old_path=url,
+                new_path=pages[0].get_absolute_url(),
+                response_code='302',
+            )
             try:
-                self.assertRedirects(response, "/en"+url, status_code=302, target_status_code=200)
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 302)
+                self.assertRedirects(response, redirect.new_path, status_code=302)
             except memcache.Client.MemcachedKeyLengthError:
                 self.fail("memcache.Client.MemcachedKeyLengthError raised")
 
