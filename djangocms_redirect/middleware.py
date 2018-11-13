@@ -12,6 +12,7 @@ from django.utils.deprecation import MiddlewareMixin
 from .models import Redirect
 from .utils import get_key_from_path_and_site
 
+
 class RedirectMiddleware(MiddlewareMixin):
 
     # Defined as class-level attributes to be subclassing-friendly.
