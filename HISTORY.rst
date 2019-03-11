@@ -3,7 +3,7 @@
 History
 -------
 
-0.3.0 (unreleased)
+0.3.0 (2019-03-11)
 ++++++++++++++++++
 
 * Added compatibility to Django 2.0, 2.1
