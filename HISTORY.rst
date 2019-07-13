@@ -3,7 +3,7 @@
 History
 -------
 
-0.3.1 (2019-06-02)
+0.3.1 (2019-07-13)
 ++++++++++++++++++
 
 * Ignore querystring when matching redirect objects
