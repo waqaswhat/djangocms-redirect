@@ -10,6 +10,7 @@ History
 * Drop compatibility with Django < 1.11
 * Drop compatibility with django CMS < 3.6
 * Move to django-app-helper
+* Add subpath matching (#21)
 
 0.3.1 (2019-07-13)
 ++++++++++++++++++
@@ -20,6 +21,11 @@ History
 ++++++++++++++++++
 
 * Added compatibility to Django 2.0, 2.1
+
+0.2.3 (unreleased)
+++++++++++++++++++
+
+* Add support to match unquoted strings as redirect old path
 
 0.2.2 (2019-06-02)
 ++++++++++++++++++
