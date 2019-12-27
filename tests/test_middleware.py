@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
+from django.utils.http import urlunquote_plus
 
 from djangocms_redirect.middleware import RedirectMiddleware
 from djangocms_redirect.models import Redirect
@@ -20,6 +21,18 @@ class TestRedirect(BaseRedirectTest):
         {'en': {'title': 'internal page', 'template': 'page.html', 'publish': True,
                 'parent': 'test-page'}},
     )
+
+    def test_str(self):
+        pages = self.get_pages()
+
+        redirect = Redirect.objects.create(
+            site=self.site_1,
+            old_path=pages[1].get_absolute_url(),
+            new_path=pages[0].get_absolute_url(),
+            response_code='301',
+        )
+        self.assertIn(pages[1].get_absolute_url(), force_text(redirect))
+        self.assertIn(pages[0].get_absolute_url(), force_text(redirect))
 
     def test_301_redirect(self):
         pages = self.get_pages()
@@ -84,6 +97,34 @@ class TestRedirect(BaseRedirectTest):
             response = self.client.get(pages[1].get_absolute_url() + '?Some_query_param')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, redirect.new_path + '?Some_query_param', status_code=302)
+
+    def test_quoted_path_redirect(self):
+        pages = self.get_pages()
+
+        escaped_path = '/path%20%28escaped%29/'
+        redirect = Redirect.objects.create(
+            site=self.site_1,
+            old_path=escaped_path,
+            new_path=pages[0].get_absolute_url(),
+            response_code='302',
+        )
+
+        response = self.client.get(escaped_path)
+        self.assertEqual(response.status_code, 404)
+
+        redirect.old_path = '/path%20(escaped)/'
+        redirect.save()
+        response = self.client.get(escaped_path)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, redirect.new_path, status_code=302)
+
+        unescaped_path = urlunquote_plus(escaped_path)
+        redirect.old_path = unescaped_path
+        redirect.save()
+
+        response = self.client.get(escaped_path)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, redirect.new_path, status_code=302)
 
     def test_410_redirect(self):
         pages = self.get_pages()
@@ -154,6 +195,7 @@ class TestRedirect(BaseRedirectTest):
             response = self.client.get(pages[1].get_absolute_url())
         self.assertRedirects(response, redirect.new_path, status_code=301)
         redirect.delete()
+
         with self.assertNumQueries(7):
             response2 = self.client.get(pages[1].get_absolute_url())
         self.assertEqual(response2.status_code, 200)
@@ -169,8 +211,24 @@ class TestRedirect(BaseRedirectTest):
                 response_code='301',
             )
 
-            with self.assertNumQueries(2):
+            with self.assertNumQueries(3):
                 response = self.client.get(pages[1].get_absolute_url().rstrip('/'))
+            self.assertRedirects(response, redirect.new_path, status_code=301)
+
+    def test_redirect_no_append_slash_quoted(self):
+        pages = self.get_pages()
+
+        original_path = '/path%20(escaped)/'
+        with override_settings(APPEND_SLASH=False):
+            redirect = Redirect.objects.create(
+                site=self.site_1,
+                old_path=original_path,
+                new_path=pages[0].get_absolute_url(),
+                response_code='301',
+            )
+
+            with self.assertNumQueries(5):
+                response = self.client.get(original_path.rstrip('/'))
             self.assertRedirects(response, redirect.new_path, status_code=301)
 
     def test_redirect_no_append_slash_no_match(self):
@@ -184,7 +242,7 @@ class TestRedirect(BaseRedirectTest):
                 response_code='301',
             )
 
-            with self.assertNumQueries(3):
+            with self.assertNumQueries(4):
                 response = self.client.get(pages[1].get_absolute_url().rstrip('/'))
             self.assertEqual(404, response.status_code)
 
