@@ -1,9 +1,13 @@
+from urllib.parse import unquote_plus
+
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db import models
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
+
+from .utils import normalize_url
 
 RESPONSE_CODES = (
     ("301", _("301 - Permanent redirection")),
@@ -59,6 +63,10 @@ class Redirect(models.Model):
         unique_together = (("site", "old_path"),)
         ordering = ("old_path",)
 
+    def clean(self):
+        self.old_path = normalize_url(self.old_path)
+        super().clean()
+
     def __str__(self):
         return "{} ---> {}".format(self.old_path, self.new_path)
 
@@ -68,5 +76,6 @@ class Redirect(models.Model):
 def clear_redirect_cache(**kwargs):
     from .utils import get_key_from_path_and_site
 
-    key = get_key_from_path_and_site(kwargs["instance"].old_path, kwargs["instance"].site_id)
+    path = unquote_plus(kwargs["instance"].old_path)
+    key = get_key_from_path_and_site(path, kwargs["instance"].site_id)
     cache.delete(key)

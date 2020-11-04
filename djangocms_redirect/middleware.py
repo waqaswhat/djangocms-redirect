@@ -8,7 +8,7 @@ from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.http import urlunquote_plus
+from django.utils.encoding import escape_uri_path, iri_to_uri
 
 from .models import Redirect
 from .utils import get_key_from_path_and_site
@@ -32,22 +32,30 @@ class RedirectMiddleware(MiddlewareMixin):
         if getattr(settings, "DJANGOCMS_REDIRECT_404_ONLY", True) and response and response.status_code != 404:
             return response
 
-        full_path_quoted, part, querystring = request.get_full_path().partition("?")
-        possible_paths = [full_path_quoted]
-        full_path_unquoted = urlunquote_plus(full_path_quoted)
-        if full_path_unquoted != full_path_quoted:
-            possible_paths.append(urlunquote_plus(full_path_unquoted))
-        if not settings.APPEND_SLASH and not request.path.endswith("/"):
-            full_path_slash, __, __ = request.get_full_path(force_append_slash=True).partition("?")
-            possible_paths.append(full_path_slash)
-            full_path_slash_unquoted = urlunquote_plus(full_path_slash)
-            if full_path_slash_unquoted != full_path_slash:
-                possible_paths.append(full_path_slash_unquoted)
-        querystring = "{}{}".format(part, querystring)
+        req_path = request.path
+        # get the query string
+        querystring = request.META.get("QUERY_STRING", "")
+        if querystring:
+            querystring = "?%s" % iri_to_uri(querystring)
+        # start with the path as is
+        possible_paths = [req_path]
+        # add the unquoted path if it differs
+        req_path_quoted = escape_uri_path(req_path)
+        if req_path_quoted != req_path:
+            possible_paths.append(req_path_quoted)
+        # if a slash is missing, try to append it
+        if not req_path.endswith("/"):
+            req_path_slash = req_path + "/"
+            possible_paths.append(req_path_slash)
+            req_path_slash_quoted = escape_uri_path(req_path_slash)
+            if req_path_slash_quoted != req_path_slash:
+                possible_paths.append(req_path_slash_quoted)
+
         current_site = get_current_site(request)
         r = None
-        key = get_key_from_path_and_site(full_path_quoted, settings.SITE_ID)
+        key = get_key_from_path_and_site(req_path, settings.SITE_ID)
         cached_redirect = cache.get(key)
+
         if not cached_redirect:
             for path in possible_paths:
                 filters = dict(site=current_site, old_path=path)
@@ -58,6 +66,7 @@ class RedirectMiddleware(MiddlewareMixin):
                     r = self._match_substring(path)
                     if r:
                         break
+
             cached_redirect = {
                 "site": settings.SITE_ID,
                 "redirect": r.new_path if r else None,

@@ -4,6 +4,7 @@ from django.test.utils import override_settings
 from django.utils.encoding import force_text
 from django.utils.http import urlunquote_plus
 
+from djangocms_redirect.admin import RedirectForm
 from djangocms_redirect.middleware import RedirectMiddleware
 from djangocms_redirect.models import Redirect
 
@@ -208,6 +209,22 @@ class TestRedirect(BaseRedirectTest):
                 response = self.client.get(pages[1].get_absolute_url().rstrip("/"))
             self.assertRedirects(response, redirect.new_path, status_code=301)
 
+    def test_redirect_no_append_slash_unquoted(self):
+        pages = self.get_pages()
+
+        original_path = "/path (escaped)/"
+        with override_settings(APPEND_SLASH=False):
+            redirect = Redirect.objects.create(
+                site=self.site_1,
+                old_path=original_path,
+                new_path=pages[0].get_absolute_url(),
+                response_code="301",
+            )
+
+            with self.assertNumQueries(5):
+                response = self.client.get(original_path.rstrip("/"))
+            self.assertRedirects(response, redirect.new_path, status_code=301)
+
     def test_redirect_no_append_slash_quoted(self):
         pages = self.get_pages()
 
@@ -220,7 +237,7 @@ class TestRedirect(BaseRedirectTest):
                 response_code="301",
             )
 
-            with self.assertNumQueries(5):
+            with self.assertNumQueries(7):
                 response = self.client.get(original_path.rstrip("/"))
             self.assertRedirects(response, redirect.new_path, status_code=301)
 
@@ -318,6 +335,43 @@ class TestRedirect(BaseRedirectTest):
             response = self.client.get("/en/a/")
             self.assertRedirects(response, "/en/b/", status_code=301)
 
+
+class TestClean(BaseRedirectTest):
+
+    _pages_data = (
+        {"en": {"title": "home page", "template": "page.html", "publish": True}},
+    )
+
+    def _make_form(self, old_path):
+        pages = self.get_pages()
+        return RedirectForm({
+            "site": self.site_1.pk,
+            "old_path": old_path,
+            "new_path": pages[0].get_absolute_url(),
+            "response_code": "301",
+        })
+
+    def _assert_clean(self, old_path, old_path_cleaned):
+        redirect_form = self._make_form(old_path)
+        redirect = redirect_form.save()
+        self.assertEqual(redirect.old_path, old_path_cleaned)
+
+    def test_clean_keep_slash(self):
+        self._assert_clean("/slash-bar/", "/slash-bar/")
+
+    def test_clean_prepend_slash(self):
+        self._assert_clean("slash-test/", "/slash-test/")
+
+    def test_clean_single_slash_root(self):
+        self._assert_clean("/", "/")
+
+    def test_clean_append_slash(self):
+        with override_settings(APPEND_SLASH=True):
+            self._assert_clean("/slash-foo", "/slash-foo/")
+
+    def test_clean_no_append_slash(self):
+        with override_settings(APPEND_SLASH=False):
+            self._assert_clean("/slash-baz", "/slash-baz")
 
 class TestPartialMatch(BaseRedirectTest):
     _pages_data = (
