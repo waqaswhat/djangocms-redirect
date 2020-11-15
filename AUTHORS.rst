@@ -15,7 +15,10 @@ Previous maintainers
 Contributors
 ------------
 
+* Adam Chainz
+* Gaetano D'Onghia <g.donghia@frankhood.it>
 * Giovanni Bottalico <g.bottalico@frankhood.it>
 * Nicola Ciccarone <n.ciccarone@frankhood.it>
-* Gaetano D'Onghia <g.donghia@frankhood.it>
+* schroedingersZombie
 * Vladimir Kuvandjiev
+* Xiphoseer

@@ -13,8 +13,9 @@ This is heavily borrowed from ``django.contrib.redirects`` with three major chan
 * Selection of redirect status code
 * Middleware can processed in the request or response phase
 
+****************************
 Why using process_request?
---------------------------
+****************************
 
 Doing database queries in the middleware ``process_request`` is heavily discouraged as it's a
 performance hit, especially when doing redirects which are just a tiny part of the
@@ -24,36 +25,29 @@ Except that sometimes it's just what you need (for example to "hide" content wit
 By caching both existing and non existing redirects for a given URL the performance hit is
 minimized for the use cases that requires ``process_request``.
 
+****************************
 Documentation
--------------
+****************************
 
 The full documentation is at https://djangocms-redirect.readthedocs.io.
 
+****************************
 Installation
-------------
+****************************
 
 See https://djangocms-redirect.readthedocs.io/en/latest/installation.html
 
+****************************
 Features
---------
+****************************
 
 * Set old and new path, by selection existing django CMS pages or writing down the complete address
 * Select the redirect status code (301, 302)
 * Support for status code 410
 
-Running Tests
--------------
-
-Does the code actually work?
-
-::
-
-    source <YOURVIRTUALENV>/bin/activate
-    (myenv) $ pip install -r requirements-test.txt
-    (myenv) $ python setup.py test
-
+****************************
 Credits
----------
+****************************
 
 Tools used in rendering this package:
 

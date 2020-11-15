@@ -338,18 +338,18 @@ class TestRedirect(BaseRedirectTest):
 
 class TestClean(BaseRedirectTest):
 
-    _pages_data = (
-        {"en": {"title": "home page", "template": "page.html", "publish": True}},
-    )
+    _pages_data = ({"en": {"title": "home page", "template": "page.html", "publish": True}},)
 
     def _make_form(self, old_path):
         pages = self.get_pages()
-        return RedirectForm({
-            "site": self.site_1.pk,
-            "old_path": old_path,
-            "new_path": pages[0].get_absolute_url(),
-            "response_code": "301",
-        })
+        return RedirectForm(
+            {
+                "site": self.site_1.pk,
+                "old_path": old_path,
+                "new_path": pages[0].get_absolute_url(),
+                "response_code": "301",
+            }
+        )
 
     def _assert_clean(self, old_path, old_path_cleaned):
         redirect_form = self._make_form(old_path)
@@ -372,6 +372,7 @@ class TestClean(BaseRedirectTest):
     def test_clean_no_append_slash(self):
         with override_settings(APPEND_SLASH=False):
             self._assert_clean("/slash-baz", "/slash-baz")
+
 
 class TestPartialMatch(BaseRedirectTest):
     _pages_data = (

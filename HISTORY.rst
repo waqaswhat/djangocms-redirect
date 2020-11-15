@@ -6,6 +6,16 @@ History
 
 .. towncrier release notes start
 
+0.6.0 (2020-11-15)
+==================
+
+Features
+--------
+
+- Drop Python 2, Django < 2.2 - Update toolchain (#39)
+- Fix Handling of trailing slashes in redirects (#31)
+
+
 Unreleased
 ==================
 
