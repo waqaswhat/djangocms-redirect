@@ -2,6 +2,7 @@ from cms.forms.widgets import PageSmartLinkWidget
 from django.contrib import admin
 from django.forms import ModelForm
 from django.utils.translation import get_language
+from import_export.admin import ImportExportModelAdmin
 
 from .models import Redirect
 from .utils import normalize_url
@@ -24,7 +25,7 @@ class RedirectForm(ModelForm):
 
 
 @admin.register(Redirect)
-class RedirectAdmin(admin.ModelAdmin):
+class RedirectAdmin(ImportExportModelAdmin):
     list_display = ("old_path", "new_path", "response_code")
     list_filter = ("site",)
     search_fields = ("old_path", "new_path")
