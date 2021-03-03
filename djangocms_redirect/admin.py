@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.forms import ModelForm
 from django.utils.translation import get_language
 from import_export.admin import ImportExportModelAdmin
+from import_export.tmp_storages import CacheStorage
 
 from .models import Redirect
 from .utils import normalize_url
@@ -26,6 +27,7 @@ class RedirectForm(ModelForm):
 
 @admin.register(Redirect)
 class RedirectAdmin(ImportExportModelAdmin):
+    tmp_storage_class = CacheStorage
     list_display = ("old_path", "new_path", "response_code")
     list_filter = ("site",)
     search_fields = ("old_path", "new_path")
