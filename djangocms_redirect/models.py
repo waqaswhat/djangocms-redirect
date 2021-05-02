@@ -28,7 +28,7 @@ class Redirect(models.Model):
         _("redirect from"), max_length=200, db_index=True, help_text=_("Select a Page or write an url")
     )
     new_path = models.CharField(
-        _("redirect to"), max_length=200, blank=True, help_text=_("Select a Page or write an url")
+        _("redirect to"), max_length=512, blank=True, help_text=_("Select a Page or write an url")
     )
     response_code = models.CharField(
         _("response code"),
