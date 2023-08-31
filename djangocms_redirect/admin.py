@@ -19,6 +19,7 @@ class RedirectForm(ModelForm):
         super().__init__(*args, **kwargs)
         widget = PageSmartLinkWidget(ajax_view="admin:cms_page_get_published_pagelist")
         widget.language = get_language()
+        # adding language widget to all fields that contains '_path'
         [setattr(self.fields[field], "widget", widget) for field in [x for x in self.fields if "_path" in x]]
 
     def clean_old_path(self):

@@ -72,6 +72,7 @@ class Redirect(models.Model):
     )
 
     def redirect_to(self, language_code='default'):
+        # When adding a new language field, languages_mapping will be modified.
         languages_mapping = {
             'de': self.de_path,
             'fr': self.fr_path,
