@@ -9,7 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import escape_uri_path, iri_to_uri
-
+from django.shortcuts import redirect
 from .models import Redirect
 from .utils import get_key_from_path_and_site
 
@@ -83,8 +83,19 @@ class RedirectMiddleware(MiddlewareMixin):
             return self.response_gone_class()
 
     def process_request(self, request):
+        language = request.META.get('HTTP_ACCEPT_LANGUAGE')
+        try:
+            redirect_entry = Redirect.objects.get(
+                old_path=request.path
+            )
+            new_path = redirect_entry.redirect_to(language_code=language)
+            if new_path:
+                return redirect(new_path)
+        except Redirect.DoesNotExist:
+            pass
         if getattr(settings, "DJANGOCMS_REDIRECT_USE_REQUEST", True):
             return self.do_redirect(request)
+
 
     def process_response(self, request, response):
         redirect = None
@@ -107,3 +118,4 @@ class RedirectMiddleware(MiddlewareMixin):
                     # without persisting the change
                     redirect.new_path = original_path.replace(redirect.old_path, redirect.new_path)
                 return redirect
+

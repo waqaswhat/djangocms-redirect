@@ -30,6 +30,21 @@ class Redirect(models.Model):
     new_path = models.CharField(
         _("redirect to"), max_length=700, blank=True, help_text=_("Select a Page or write an url")
     )
+    default_path = models.CharField(
+        _("redirect to (default)"), max_length=700, blank=True, help_text=_("Select a Page or write an url")
+    )
+    de_path = models.CharField(
+        _("redirect to (de)"), max_length=700, blank=True, help_text=_("Select a Page or write an url")
+    )
+    en_path = models.CharField(
+        _("redirect to (en)"), max_length=700, blank=True, help_text=_("Select a Page or write an url")
+    )
+    it_path = models.CharField(
+        _("redirect to (it)"), max_length=700, blank=True, help_text=_("Select a Page or write an url")
+    )
+    fr_path = models.CharField(
+        _("redirect to (fr)"), max_length=700, blank=True, help_text=_("Select a Page or write an url")
+    )
     response_code = models.CharField(
         _("response code"),
         max_length=3,
@@ -55,6 +70,15 @@ class Redirect(models.Model):
             "If selected all the pages starting with the given string will be redirected to the " "given redirect path"
         ),
     )
+
+    def redirect_to(self, language_code='default'):
+        languages_mapping = {
+            'de': self.de_path,
+            'fr': self.fr_path,
+            'it': self.it_path,
+            'en': self.en_path
+        }
+        return languages_mapping.get(language_code, self.default_path)
 
     class Meta:
         verbose_name = _("redirect")
