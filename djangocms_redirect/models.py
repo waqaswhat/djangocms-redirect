@@ -30,21 +30,6 @@ class Redirect(models.Model):
     new_path = models.CharField(
         _("redirect to"), max_length=700, blank=True, help_text=_("Select a Page or write an url")
     )
-    default_path = models.CharField(
-        _("redirect to (default)"), max_length=700, blank=True, help_text=_("Select a Page or write an url")
-    )
-    de_path = models.CharField(
-        _("redirect to (de)"), max_length=700, blank=True, help_text=_("Select a Page or write an url")
-    )
-    en_path = models.CharField(
-        _("redirect to (en)"), max_length=700, blank=True, help_text=_("Select a Page or write an url")
-    )
-    it_path = models.CharField(
-        _("redirect to (it)"), max_length=700, blank=True, help_text=_("Select a Page or write an url")
-    )
-    fr_path = models.CharField(
-        _("redirect to (fr)"), max_length=700, blank=True, help_text=_("Select a Page or write an url")
-    )
     response_code = models.CharField(
         _("response code"),
         max_length=3,
@@ -71,15 +56,6 @@ class Redirect(models.Model):
         ),
     )
 
-    def redirect_to(self, language_code='default'):
-        # When adding a new language field, languages_mapping will be modified.
-        languages_mapping = {
-            'de': self.de_path,
-            'fr': self.fr_path,
-            'it': self.it_path,
-            'en': self.en_path
-        }
-        return languages_mapping.get(language_code, self.default_path)
 
     class Meta:
         verbose_name = _("redirect")
@@ -93,7 +69,7 @@ class Redirect(models.Model):
         super().clean()
 
     def __str__(self):
-        return "{} ---> {}".format(self.old_path, self.new_path)
+        return self.old_path
 
 
 @receiver(post_save, sender=Redirect)
@@ -104,3 +80,36 @@ def clear_redirect_cache(**kwargs):
     path = unquote_plus(kwargs["instance"].old_path)
     key = get_key_from_path_and_site(path, kwargs["instance"].site_id)
     cache.delete(key)
+
+class Language(models.Model):
+    name = models.CharField(max_length=255)
+    code = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f'{self.name}-{self.code}'
+
+class LanguageRedirect(models.Model):
+    redirect = models.ForeignKey(
+        Redirect,
+        on_delete=models.CASCADE,
+        related_name='language_redirects',
+        verbose_name=_("Redirect")
+    )
+    language_code = models.ForeignKey(
+        Language,
+        on_delete=models.CASCADE,
+        related_name='language_code',
+        verbose_name=_("Language_code")
+    )
+    redirect_path = models.CharField(
+        _("Redirect Path"),
+        max_length=700,
+        blank=True,
+        null=True,
+        help_text=_("Enter the redirect path for this language."),
+    )
+
+    def __str__(self):
+        return f"{self.redirect} - {self.language_code}"
+
+
