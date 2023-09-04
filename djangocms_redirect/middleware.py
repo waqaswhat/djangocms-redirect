@@ -1,5 +1,4 @@
 from operator import itemgetter
-
 from django import http
 from django.apps import apps
 from django.conf import settings
@@ -88,12 +87,13 @@ class RedirectMiddleware(MiddlewareMixin):
             redirect_entry = LanguageRedirect.objects.get(
                 redirect__old_path=request.path, language_code=language
             )
-            if redirect_entry:
-                return redirect(redirect_entry.redirect_path)
-            else:
-                return redirect(redirect_entry.redirect.new_path)
+            return redirect(redirect_entry.redirect_path)
         except LanguageRedirect.DoesNotExist as e:
-            pass
+            try:
+                redirect_new = Redirect.objects.get(old_path=request.path)
+                return redirect(redirect_new.new_path)
+            except Redirect.DoesNotExist as e:
+                pass
         if getattr(settings, "DJANGOCMS_REDIRECT_USE_REQUEST", True):
             return self.do_redirect(request)
 
