@@ -86,14 +86,16 @@ class RedirectMiddleware(MiddlewareMixin):
         language = request.META.get('HTTP_ACCEPT_LANGUAGE')
         try:
             redirect_entry = LanguageRedirect.objects.get(
-                redirect__old_path=request.path, language_code__code=language
+                redirect__old_path=request.path, language_code=language
             )
-            return redirect(redirect_entry.redirect_path)
+            if redirect_entry:
+                return redirect(redirect_entry.redirect_path)
+            else:
+                return redirect(redirect_entry.redirect.new_path)
         except LanguageRedirect.DoesNotExist as e:
             pass
         if getattr(settings, "DJANGOCMS_REDIRECT_USE_REQUEST", True):
             return self.do_redirect(request)
-
 
     def process_response(self, request, response):
         redirect = None

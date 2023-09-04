@@ -1,13 +1,13 @@
 from urllib.parse import unquote_plus
-
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db import models
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-
 from .utils import normalize_url
+from django.conf import settings
+
 
 RESPONSE_CODES = (
     ("301", _("301 - Permanent redirection")),
@@ -69,7 +69,7 @@ class Redirect(models.Model):
         super().clean()
 
     def __str__(self):
-        return self.old_path
+        return "{} ---> {}".format(self.old_path, self.new_path)
 
 
 @receiver(post_save, sender=Redirect)
@@ -81,12 +81,6 @@ def clear_redirect_cache(**kwargs):
     key = get_key_from_path_and_site(path, kwargs["instance"].site_id)
     cache.delete(key)
 
-class Language(models.Model):
-    name = models.CharField(max_length=255)
-    code = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f'{self.name}-{self.code}'
 
 class LanguageRedirect(models.Model):
     redirect = models.ForeignKey(
@@ -95,11 +89,9 @@ class LanguageRedirect(models.Model):
         related_name='language_redirects',
         verbose_name=_("Redirect")
     )
-    language_code = models.ForeignKey(
-        Language,
-        on_delete=models.CASCADE,
-        related_name='language_code',
-        verbose_name=_("Language_code")
+    language_code = models.CharField(
+        max_length=5,
+        choices=settings.LANGUAGES
     )
     redirect_path = models.CharField(
         _("Redirect Path"),
